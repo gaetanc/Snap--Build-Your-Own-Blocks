@@ -2199,6 +2199,8 @@ Morph.prototype.init = function () {
     this.drawNew();
     this.fps = 0;
     this.customContextMenu = null;
+    //TODO
+    this.isStudentMorph = false;
     this.lastTime = Date.now();
     this.onNextStep = null; // optional function to be run once
 };
@@ -3312,6 +3314,10 @@ Morph.prototype.inspect = function (anotherObject) {
 
 Morph.prototype.contextMenu = function () {
     var world;
+    //TODO Gaetan
+    if (this.isStudentMorph){
+        return this.studentMenu;
+    }
 
     if (this.customContextMenu) {
         return this.customContextMenu;
@@ -3323,6 +3329,7 @@ Morph.prototype.contextMenu = function () {
         }
         return this.hierarchyMenu();
     }
+
     return this.userMenu() ||
         (this.parent && this.parent.userMenu());
 };
@@ -3341,6 +3348,19 @@ Morph.prototype.hierarchyMenu = function () {
     });
     return menu;
 };
+
+//TODO
+Morph.prototype.studentMenu = function(){
+    menu = new MenuMorph(this, null);
+    menu.addItem(
+        'user features...',
+        function () {
+            userMenu.popUpAtHand(world);
+        }
+    );
+    menu.addLine();
+    return menu;
+}
 
 Morph.prototype.developersMenu = function () {
     // 'name' is not an official property of a function, hence:
@@ -6579,8 +6599,8 @@ MenuMorph.uber = BoxMorph.prototype;
 
 // MenuMorph instance creation:
 
-function MenuMorph(target, title, environment, fontSize) {
-    this.init(target, title, environment, fontSize);
+function MenuMorph(target, title, environment, fontSize, hidden) {
+    this.init(target, title, environment, fontSize, hidden);
 
     /*
     if target is a function, use it as callback:
@@ -6602,8 +6622,8 @@ function MenuMorph(target, title, environment, fontSize) {
         for selector-like actions
     */
 }
-
-MenuMorph.prototype.init = function (target, title, environment, fontSize) {
+//TODO hidden a ete rajouter gaetan
+MenuMorph.prototype.init = function (target, title, environment, fontSize, hidden) {
     // additional properties:
     this.target = target;
     this.title = title || null;
@@ -6613,6 +6633,7 @@ MenuMorph.prototype.init = function (target, title, environment, fontSize) {
     this.label = null;
     this.world = null;
     this.isListContents = false;
+    this.hidden = hidden ||false;
 
     // initialize inherited properties:
     MenuMorph.uber.init.call(this);
@@ -9921,6 +9942,8 @@ WorldMorph.prototype.init = function (aCanvas, fillPage) {
         this.useFillPage = true;
     }
     this.isDevMode = false;
+    //TODO
+    this.isStudentMorph = false;
     this.broken = [];
     this.hand = new HandMorph(this);
     this.keyboardReceiver = null;
