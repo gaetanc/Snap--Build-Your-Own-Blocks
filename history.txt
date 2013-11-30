@@ -1929,3 +1929,66 @@ ______
 130930
 ------
 * Blocks: fixed #186 (can't duplicate blocks with anchored comments)
+
+131001
+------
+* Objects: smooth numerical values displayed in watchers
+
+131004
+------
+* Threads: Type-check the SPLIT block's input before eval'ing it
+* Objects: Prevent watcher cells from growing wider as their contents becomes taller
+* Objects: Keep watchers onstage when hiding/showing them, fixes #195
+* BYOB, GUI, locale: New preference setting for plain block prototype labels
+
+131008
+------
+* Lists: fixed type-issue for linked list indices (thanks, Nate, for reporting it!)
+* Threads, Objects: experimental MAP primitive reporter in lists category, visible in dev mode
+* Blocks: fixed #199 (can't delete reporter with attached comment via context menu)
+
+131009
+------
+* Theads: added a variant for linked lists to the experimental MAP primitive reporter
+
+131010
+------
+* Cloud: added "sanity check" to cloud-saving mechanism that errors if the serialized project data is corrupt and cannot be parsed as XML, addresses #203, #200, #171
+
+131014
+------
+* Morphic: Condense damage list by merging overlapping dirty rectangles, thanks, Craxic!
+* Objects: Increase maximum clone count from 128 to 300
+* Portuguese translation update, thanks, Manuel!!
+
+131015
+------
+* Morphic: further condense damage list by merging nearby rectangles, thanks, Craxic!
+
+131017
+------
+* Threads: fixed #213 - Empty else block breaks return to caller
+
+131025
+------
+* Blocks: enable Costumes as Symbols and Symbols as custom block label parts
+* BYOB: Symbol selection menu for BlockLabelFragmentMorphs
+* Portuguese translation update
+* Widgets: enable Symbols in InputField drop down menus
+* BYOB: enable Symbols in InputSlotDialog Morph’s drop down menu
+
+131104
+------
+* GUI: filter quotation marks from project names (for backend index)
+* BYOB: only show symbol menu for label fragments
+* BYOB: customizable drop-down menus for input slots (experimental, commented out)
+
+131107
+------
+* GUI, Cloud: transmission integrity check
+
+131112
+------
+* Blocks, BYOB, Store: customizable drop-down menus for input slots
+* Objects: fixed wrong NaN display for variable watchers
+* Blocks: left-align multi-line text in value-bubbles

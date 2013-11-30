@@ -64,11 +64,11 @@ standardSettings, Sound, BlockMorph, ToggleMorph, InputSlotDialogMorph,
 ScriptsMorph, isNil, SymbolMorph, BlockExportDialogMorph,
 BlockImportDialogMorph, SnapTranslator, localize, List, InputSlotMorph,
 SnapCloud, Uint8Array, HandleMorph, SVG_Costume, fontHeight, hex_sha512,
-sb, CommentMorph, CommandBlockMorph*/
+sb, CommentMorph, CommandBlockMorph, BlockLabelPlaceHolderMorph*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.gui = '2013-September-19';
+modules.gui = '2013-November-07';
 
 // Declarations
 
@@ -1460,7 +1460,7 @@ IDE_Morph.prototype.fixLayout = function (situation) {
 };
 
 IDE_Morph.prototype.setProjectName = function (string) {
-    this.projectName = string;
+    this.projectName = string.replace(/['"]/g, ''); // filter quotation marks
     this.hasChangedMedia = true;
     this.controlBar.updateLabel();
 };
@@ -1722,7 +1722,8 @@ IDE_Morph.prototype.applySavedSettings = function () {
         zoom = this.getSetting('zoom'),
         language = this.getSetting('language'),
         click = this.getSetting('click'),
-        longform = this.getSetting('longform');
+        longform = this.getSetting('longform'),
+        plainprototype = this.getSetting('plainprototype');
 
     // design
     if (design === 'flat') {
@@ -1753,6 +1754,11 @@ IDE_Morph.prototype.applySavedSettings = function () {
     // long form
     if (longform) {
         InputSlotDialogMorph.prototype.isLaunchingExpanded = true;
+    }
+
+    // plain prototype labels
+    if (plainprototype) {
+        BlockLabelPlaceHolderMorph.prototype.plainLabel = true;
     }
 };
 
@@ -2227,6 +2233,7 @@ IDE_Morph.prototype.settingsMenu = function () {
             'uncheck for greater speed\nat variable frame rates',
             'check for smooth, predictable\nanimations across computers'
         );
+
         addPreference(
             'Codification support',
             function () {
@@ -2449,6 +2456,52 @@ IDE_Morph.prototype.projectMenu = function () {
         );
     }
 
+
+    menu.addLine();
+    menu.addItem(
+        'Import tools',
+        function () {
+            myself.droppedText(
+                myself.getURL(
+                    'http://snap.berkeley.edu/snapsource/tools.xml'
+                ),
+                'tools'
+            );
+        },
+        'load the official library of\npowerful blocks'
+    );
+    menu.addItem(
+        'Libraries...',
+        function () {
+            // read a list of libraries from an external file,
+            var libMenu = new MenuMorph(this, 'Import library'),
+                libUrl = 'http://snap.berkeley.edu/snapsource/libraries/' +
+                    'LIBRARIES';
+
+            function loadLib(name) {
+                var url = 'http://snap.berkeley.edu/snapsource/libraries/'
+                        + name
+                        + '.xml';
+                myself.droppedText(myself.getURL(url), name);
+            }
+
+            myself.getURL(libUrl).split('\n').forEach(function (line) {
+                if (line.length > 0) {
+                    libMenu.addItem(
+                        line.substring(line.indexOf('\t') + 1),
+                        function () {
+                            loadLib(
+                                line.substring(0, line.indexOf('\t'))
+                            );
+                        }
+                    );
+                }
+            });
+
+            libMenu.popup(world, pos);
+        },
+        'Select categories of additional blocks to add to this project.'
+    );
     menu.popup(world, pos);
 };
 
@@ -3122,6 +3175,16 @@ IDE_Morph.prototype.toggleLongFormInputDialog = function () {
         this.saveSetting('longform', true);
     } else {
         this.removeSetting('longform');
+    }
+};
+
+IDE_Morph.prototype.togglePlainPrototypeLabels = function () {
+    BlockLabelPlaceHolderMorph.prototype.plainLabel =
+        !BlockLabelPlaceHolderMorph.prototype.plainLabel;
+    if (BlockLabelPlaceHolderMorph.prototype.plainLabel) {
+        this.saveSetting('plainprototype', true);
+    } else {
+        this.removeSetting('plainprototype');
     }
 };
 
@@ -3838,7 +3901,7 @@ IDE_Morph.prototype.setCloudURL = function () {
             'local network lab' :
                 '192.168.2.107:8087/miocon/app/login?_app=SnapCloud',
             'local network office' :
-                '192.168.186.167:8087/miocon/app/login?_app=SnapCloud',
+                '192.168.186.146:8087/miocon/app/login?_app=SnapCloud',
             'localhost dev' :
                 'localhost/miocon/app/login?_app=SnapCloud'
         }

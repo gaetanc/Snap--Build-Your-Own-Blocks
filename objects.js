@@ -124,7 +124,7 @@ PrototypeHatBlockMorph*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.objects = '2013-September-19';
+modules.objects = '2013-November-12';
 
 var SpriteMorph;
 var StageMorph;
@@ -1045,6 +1045,13 @@ SpriteMorph.prototype.initBlocks = function () {
             defaults: [1, null, localize('thing')]
         },
 
+        // MAP - experimental
+        reportMap: {
+            type: 'reporter',
+            category: 'lists',
+            spec: 'map %repRing over %l'
+        },
+
         // Code mapping - experimental
         doMapCodeOrHeader: { // experimental
             type: 'command',
@@ -1850,6 +1857,22 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('doInsertInList'));
         blocks.push(block('doReplaceInList'));
 
+    // for debugging: ///////////////
+
+        if (this.world().isDevMode) {
+            blocks.push('-');
+            txt = new TextMorph(localize(
+                'development mode \ndebugging primitives:'
+            ));
+            txt.fontSize = 9;
+            txt.setColor(this.paletteTextColor);
+            blocks.push(txt);
+            blocks.push('-');
+            blocks.push(block('reportMap'));
+        }
+
+    /////////////////////////////////
+
         blocks.push('=');
 
         if (StageMorph.prototype.enableCodeMapping) {
@@ -2323,7 +2346,7 @@ SpriteMorph.prototype.createClone = function () {
         hats,
         stage = this.parentThatIsA(StageMorph);
     if (stage) {
-        if (stage.cloneCount > 128) {return; }
+        if (stage.cloneCount > 300) {return; }
         stage.cloneCount += 1;
         clone = this.fullCopy();
         clone.isClone = true;
@@ -3063,6 +3086,7 @@ SpriteMorph.prototype.toggleVariableWatcher = function (varName, isGlobal) {
         } else {
             watcher.show();
             watcher.fixLayout(); // re-hide hidden parts
+            watcher.keepWithin(stage);
         }
         return;
     }
@@ -3081,6 +3105,7 @@ SpriteMorph.prototype.toggleVariableWatcher = function (varName, isGlobal) {
     }
     stage.add(watcher);
     watcher.fixLayout();
+    watcher.keepWithin(stage);
 };
 
 SpriteMorph.prototype.showingVariableWatcher = function (varName) {
@@ -3122,6 +3147,7 @@ SpriteMorph.prototype.toggleWatcher = function (selector, label, color) {
         } else {
             watcher.show();
             watcher.fixLayout(); // re-hide hidden parts
+            watcher.keepWithin(stage);
         }
         return;
     }
@@ -3140,6 +3166,7 @@ SpriteMorph.prototype.toggleWatcher = function (selector, label, color) {
     }
     stage.add(watcher);
     watcher.fixLayout();
+    watcher.keepWithin(stage);
 };
 
 SpriteMorph.prototype.showingWatcher = function (selector) {
@@ -4488,6 +4515,22 @@ StageMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('doInsertInList'));
         blocks.push(block('doReplaceInList'));
 
+    // for debugging: ///////////////
+
+        if (this.world().isDevMode) {
+            blocks.push('-');
+            txt = new TextMorph(localize(
+                'development mode \ndebugging primitives:'
+            ));
+            txt.fontSize = 9;
+            txt.setColor(this.paletteTextColor);
+            blocks.push(txt);
+            blocks.push('-');
+            blocks.push(block('reportMap'));
+        }
+
+    /////////////////////////////////
+
         blocks.push('=');
 
         if (StageMorph.prototype.enableCodeMapping) {
@@ -5727,7 +5770,8 @@ CellMorph.prototype.drawNew = function () {
     this.silentSetWidth(Math.max(
         this.contentsMorph.width() + this.edge * 2,
         (this.contents instanceof Context ||
-            this.contents instanceof List ? 0 : this.height() * 2)
+            this.contents instanceof List ? 0 :
+                    SyntaxElementMorph.prototype.fontSize * 3.5)
     ));
 
     // draw my outline
@@ -5993,13 +6037,16 @@ WatcherMorph.prototype.update = function () {
         } else {
             newValue = this.target[this.getter]();
         }
+        num = +newValue;
+        if (!isNaN(num)) {
+            newValue = Math.round(newValue * 1000000000) / 1000000000;
+        }
         if (newValue !== this.currentValue) {
             this.changed();
             this.cellMorph.contents = newValue;
             this.cellMorph.drawNew();
-            num = parseFloat(newValue);
-            if (!isNaN(num)) {
-                this.sliderMorph.value = num;
+            if (!isNaN(newValue)) {
+                this.sliderMorph.value = newValue;
                 this.sliderMorph.drawNew();
             }
             this.fixLayout();
