@@ -271,6 +271,7 @@ IDE_Morph.prototype.openIn = function (world) {
         }
     };
 
+
     this.reactToWorldResize(world.bounds);
 
     function getURL(url) {
@@ -2387,7 +2388,6 @@ IDE_Morph.prototype.projectMenu = function () {
                             + '.xml';
                     myself.droppedText(myself.getURL(url), name);
                 }
-
                 myself.getURL(libUrl).split('\n').forEach(function (line) {
                     if (line.length > 0) {
                         libMenu.addItem(
